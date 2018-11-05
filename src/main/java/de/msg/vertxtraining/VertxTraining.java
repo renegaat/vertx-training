@@ -19,7 +19,15 @@ public class VertxTraining {
                 logger.info("verticle HttServer deployed with error");
             }
         });
-        
+
+        vertx.deployVerticle(new FirstVerticle(), res -> {
+            if (res.succeeded()) {
+                logger.info("verticle one deployed successfully");
+            } else {
+                logger.info("verticle one deployed with error");
+            }
+        });
+
         vertx.deployVerticle(new SecondVerticle(), res -> {
             if (res.succeeded()) {
                 logger.info("verticle two deployed successfully");
@@ -28,7 +36,5 @@ public class VertxTraining {
             }
         });
 
-
     }
-
 }

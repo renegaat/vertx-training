@@ -2,21 +2,29 @@ package de.msg.vertxtraining;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 public class HttpServerVerticle extends AbstractVerticle {
-    
+
+    private final Logger logger = LoggerFactory.getLogger(HttpServerVerticle.class);
+
     @Override
-    public void start(Future<Void> startFuture) throws Exception {
-        
-        vertx.createHttpServer().requestHandler(httpServerRequest -> httpServerRequest.response()
-                .end("Hello HttpServerVerticle ")).listen(8080, httpServerAsyncResult -> {
-                    if (httpServerAsyncResult.succeeded()) {
-                        startFuture.complete();
+    public void start() {
+        vertx.createHttpServer()
+                .requestHandler(httpRequest -> sendMessage())
+                .listen(8080);
+    }
+    
+    private void sendMessage() {
+        vertx.eventBus().send(Services.HELLO_WORLD.toString(), Operations.HELLO_WORLD_OPERATION.toString(),
+                messageAsyncResult -> {
+                    if (messageAsyncResult.succeeded()) {
+                        logger.info(messageAsyncResult.result().body().toString());
                     } else {
-                        startFuture.fail(httpServerAsyncResult.cause());
+                        logger.info(messageAsyncResult.cause().getMessage());
                     }
-                }
-        );
+                });
     }
 }   
 
